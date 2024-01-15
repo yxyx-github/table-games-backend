@@ -1,0 +1,5 @@
+services:
+  table-games-backend:
+    build: ./source/rest/
+    ports:
+      - 80:80
