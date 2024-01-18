@@ -12,6 +12,6 @@
 
     <artifactId>table-games-backend-core-session</artifactId>
     <packaging>jar</packaging>
-    <name>Table Games Backend Session</name>
+    <name>Table Games Backend enitity.Session</name>
 
 </project>
