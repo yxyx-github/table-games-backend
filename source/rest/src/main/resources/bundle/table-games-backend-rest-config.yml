@@ -1,0 +1,6 @@
+#table-games:
+#  session:
+#    session-cleanup-interval: PT1M
+#    session-duration: PT5M
+#  rest:
+#    sse-timeout: PT5M

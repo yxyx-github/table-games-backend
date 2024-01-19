@@ -1,5 +1,6 @@
 package de.hwrberlin.sweii.tablegames.session.enitity
 
+import de.hwrberlin.sweii.tablegames.session.Game
 import jakarta.persistence.*
 import java.time.LocalDateTime
 
@@ -9,6 +10,8 @@ data class Session(
     var token: String,
     @OneToOne(orphanRemoval = true)
     var host: User,
+    @Column(nullable = false)
+    var game: Game,
     @OneToMany(orphanRemoval = true)
     var users: MutableList<User> = mutableListOf(host),
     var lastAccess: LocalDateTime = LocalDateTime.now(),
