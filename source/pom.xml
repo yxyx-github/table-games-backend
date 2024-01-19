@@ -57,6 +57,17 @@
 
     <dependencyManagement>
         <dependencies>
+            <!-- Modules -->
+            <dependency>
+                <groupId>de.hwr-berlin.swe-ii</groupId>
+                <artifactId>table-games-backend-core-tic-tac-toe</artifactId>
+                <version>localbuild</version>
+            </dependency>
+            <dependency>
+                <groupId>de.hwr-berlin.swe-ii</groupId>
+                <artifactId>table-games-backend-core-session</artifactId>
+                <version>localbuild</version>
+            </dependency>
             <!-- Kotlin -->
             <dependency>
                 <groupId>org.jetbrains.kotlin</groupId>
@@ -118,6 +129,8 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+        <sourceDirectory>src/main/kotlin</sourceDirectory>
+        <testSourceDirectory>src/test/kotlin</testSourceDirectory>
         <plugins>
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>

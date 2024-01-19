@@ -14,4 +14,11 @@
     <packaging>jar</packaging>
     <name>Table Games Backend Tic-Tac-Toe</name>
 
+    <dependencies>
+        <dependency>
+            <groupId>de.hwr-berlin.swe-ii</groupId>
+            <artifactId>table-games-backend-core-session</artifactId>
+        </dependency>
+    </dependencies>
+
 </project>
