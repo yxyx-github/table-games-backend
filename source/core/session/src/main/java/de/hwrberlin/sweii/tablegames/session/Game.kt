@@ -1,4 +1,4 @@
-package de.hwrberlin.sweii.tablegames.rest.general
+package de.hwrberlin.sweii.tablegames.session
 
 enum class Game(
     val minPlayerCount: Int,

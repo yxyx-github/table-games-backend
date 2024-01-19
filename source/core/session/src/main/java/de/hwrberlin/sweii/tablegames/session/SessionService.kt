@@ -21,14 +21,14 @@ class SessionService(
     private val tokenGenerator: TokenGenerator = TokenGenerator()
     private val log: Logger = LoggerFactory.getLogger(SessionService::class.java)
 
-    fun createSession(hostUsername: String): Session {
+    fun createSession(hostUsername: String, game: Game): Session {
         var token: String = tokenGenerator.generateToken()
         while (sessionRepository.findByToken(token) != null) {
             token = tokenGenerator.generateToken()
         }
 
         val user: User = User(hostUsername, tokenGenerator.generateToken())
-        val session: Session = Session(token, user)
+        val session: Session = Session(token, user, game)
         userRepository.save(user)
         return sessionRepository.save(session)
     }
@@ -46,6 +46,10 @@ class SessionService(
         if (existingUser != null) {
             existingUser.authToken = token
             return userRepository.save(existingUser)
+        }
+
+        if (session.users.size >= session.game.maxPlayerCount) {
+            return null
         }
 
         val user: User = userRepository.save(User(username, token))

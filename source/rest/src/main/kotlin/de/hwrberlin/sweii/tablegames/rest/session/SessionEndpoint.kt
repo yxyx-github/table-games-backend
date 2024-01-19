@@ -18,7 +18,7 @@ class SessionEndpoint(private val sessionService: SessionService, private val ss
 
     @PostMapping("/session/create")
     fun createSession(@RequestBody sessionCreationRequest: SessionCreationRequest): SessionCreationResponse {
-        val session = sessionService.createSession(sessionCreationRequest.host)
+        val session = sessionService.createSession(sessionCreationRequest.host, sessionCreationRequest.game)
         return SessionCreationResponse(session.token, session.host.authToken, session.host.id!!)
     }
 
