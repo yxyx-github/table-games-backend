@@ -30,7 +30,7 @@ class SessionService(
         val user: User = User(hostUsername, tokenGenerator.generateToken())
         val session: Session = Session(token, user)
         userRepository.save(user)
-        return sessionRepository.save(session);
+        return sessionRepository.save(session)
     }
 
     fun addUserToSession(sessionToken: String, username: String): User? {
@@ -61,6 +61,11 @@ class SessionService(
         }
         sessionRepository.delete(session)
         return true
+    }
+
+    fun verifyUser(sessionToken: String, authToken: String): Boolean {
+        val session: Session = sessionRepository.findByToken(sessionToken) ?: return false
+        return session.users.any { it.authToken == authToken }
     }
 
     @Scheduled(
