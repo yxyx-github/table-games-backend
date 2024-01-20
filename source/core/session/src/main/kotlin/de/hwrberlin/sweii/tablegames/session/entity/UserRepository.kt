@@ -1,4 +1,4 @@
-package de.hwrberlin.sweii.tablegames.session.enitity
+package de.hwrberlin.sweii.tablegames.session.entity
 
 import org.springframework.data.jpa.repository.JpaRepository
 

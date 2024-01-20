@@ -57,6 +57,22 @@
 
     <dependencyManagement>
         <dependencies>
+            <!-- Modules -->
+            <dependency>
+                <groupId>de.hwr-berlin.swe-ii</groupId>
+                <artifactId>table-games-backend-core-general</artifactId>
+                <version>localbuild</version>
+            </dependency>
+            <dependency>
+                <groupId>de.hwr-berlin.swe-ii</groupId>
+                <artifactId>table-games-backend-core-tic-tac-toe</artifactId>
+                <version>localbuild</version>
+            </dependency>
+            <dependency>
+                <groupId>de.hwr-berlin.swe-ii</groupId>
+                <artifactId>table-games-backend-core-session</artifactId>
+                <version>localbuild</version>
+            </dependency>
             <!-- Kotlin -->
             <dependency>
                 <groupId>org.jetbrains.kotlin</groupId>
@@ -78,7 +94,7 @@
             <dependency>
                 <groupId>com.h2database</groupId>
                 <artifactId>h2</artifactId>
-                <version>2.2.224    </version>
+                <version>2.2.224</version>
             </dependency>
             <!-- Test -->
             <dependency>
@@ -118,6 +134,8 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+        <sourceDirectory>src/main/kotlin</sourceDirectory>
+        <testSourceDirectory>src/test/kotlin</testSourceDirectory>
         <plugins>
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>

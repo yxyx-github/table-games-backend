@@ -13,7 +13,7 @@ import org.springframework.scheduling.annotation.EnableScheduling
 @ComponentScan("de.hwrberlin")
 @ConfigurationPropertiesScan("de.hwrberlin")
 @EnableJpaRepositories("de.hwrberlin")
-@EntityScan("de.hwrberlin.sweii.tablegames.session.enitity")
+@EntityScan("de.hwrberlin.sweii.tablegames.session.entity")
 @EnableScheduling
 @SpringBootApplication
 open class TableGamesRestEndpointApplication
