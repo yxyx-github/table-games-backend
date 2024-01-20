@@ -1,24 +1,28 @@
 package de.hwrberlin.sweii.tablegames.rest.session
 
+import de.hwrberlin.sweii.tablegames.general.Game
+import de.hwrberlin.sweii.tablegames.general.GameState
 import de.hwrberlin.sweii.tablegames.rest.SseService
 import de.hwrberlin.sweii.tablegames.session.SessionService
-import de.hwrberlin.sweii.tablegames.session.enitity.User
+import de.hwrberlin.sweii.tablegames.session.entity.User
+import de.hwrberlin.sweii.tablegames.tictactoe.TicTacToe
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.ResponseStatus
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
 
 @RestController
-class SessionEndpoint(private val sessionService: SessionService, private val sseService: SseService) {
+class SessionEndpoint(
+    private val sessionService: SessionService,
+    private val sseService: SseService,
+) {
 
     @PostMapping("/session/create")
     fun createSession(@RequestBody sessionCreationRequest: SessionCreationRequest): SessionCreationResponse {
-        val session = sessionService.createSession(sessionCreationRequest.host, sessionCreationRequest.game)
+        val gameState: GameState = when (sessionCreationRequest.game) {
+            Game.TIC_TAC_TOE -> TicTacToe()
+        }
+        val session = sessionService.createSession(sessionCreationRequest.host, sessionCreationRequest.game, gameState)
         return SessionCreationResponse(session.token, session.host.authToken, session.host.id!!)
     }
 

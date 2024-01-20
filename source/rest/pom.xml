@@ -15,6 +15,16 @@
     <name>Table Games Backend Rest</name>
 
     <dependencies>
+        <!-- Internal -->
+        <dependency>
+            <groupId>de.hwr-berlin.swe-ii</groupId>
+            <artifactId>table-games-backend-core-session</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.hwr-berlin.swe-ii</groupId>
+            <artifactId>table-games-backend-core-tic-tac-toe</artifactId>
+        </dependency>
+        <!-- Spring -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -22,10 +32,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>de.hwr-berlin.swe-ii</groupId>
-            <artifactId>table-games-backend-core-session</artifactId>
         </dependency>
     </dependencies>
 

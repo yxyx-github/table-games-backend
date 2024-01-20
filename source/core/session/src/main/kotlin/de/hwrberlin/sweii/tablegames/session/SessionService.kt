@@ -1,10 +1,12 @@
 package de.hwrberlin.sweii.tablegames.session
 
+import de.hwrberlin.sweii.tablegames.general.Game
+import de.hwrberlin.sweii.tablegames.general.GameState
 import de.hwrberlin.sweii.tablegames.session.config.SessionConfiguration
-import de.hwrberlin.sweii.tablegames.session.enitity.Session
-import de.hwrberlin.sweii.tablegames.session.enitity.SessionRepository
-import de.hwrberlin.sweii.tablegames.session.enitity.User
-import de.hwrberlin.sweii.tablegames.session.enitity.UserRepository
+import de.hwrberlin.sweii.tablegames.session.entity.Session
+import de.hwrberlin.sweii.tablegames.session.entity.SessionRepository
+import de.hwrberlin.sweii.tablegames.session.entity.User
+import de.hwrberlin.sweii.tablegames.session.entity.UserRepository
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
@@ -21,14 +23,14 @@ class SessionService(
     private val tokenGenerator: TokenGenerator = TokenGenerator()
     private val log: Logger = LoggerFactory.getLogger(SessionService::class.java)
 
-    fun createSession(hostUsername: String, game: Game): Session {
+    fun createSession(hostUsername: String, game: Game, initialGameState: GameState): Session {
         var token: String = tokenGenerator.generateToken()
         while (sessionRepository.findByToken(token) != null) {
             token = tokenGenerator.generateToken()
         }
 
         val user: User = User(hostUsername, tokenGenerator.generateToken())
-        val session: Session = Session(token, user, game)
+        val session: Session = Session(token, user, game, initialGameState)
         userRepository.save(user)
         return sessionRepository.save(session)
     }
@@ -58,6 +60,23 @@ class SessionService(
         return user
     }
 
+    fun getSession(sessionToken: String): Session? {
+        return sessionRepository.findByToken(sessionToken)
+    }
+
+    fun getGameState(sessionToken: String): GameState? {
+        return sessionRepository.findByToken(sessionToken)?.gameState
+    }
+
+    fun updateGameState(sessionToken: String, gameState: GameState): Boolean {
+        val session: Session = sessionRepository.findByToken(sessionToken) ?: return false
+        session.gameState = gameState
+        session.lastAccess = LocalDateTime.now()
+        sessionRepository.save(session)
+        return true
+    }
+
+
     fun closeSession(sessionToken: String, hostToken: String): Boolean {
         val session: Session = sessionRepository.findByToken(sessionToken) ?: return false
         if (session.host.authToken != hostToken) {
@@ -70,6 +89,11 @@ class SessionService(
     fun verifyUser(sessionToken: String, authToken: String): Boolean {
         val session: Session = sessionRepository.findByToken(sessionToken) ?: return false
         return session.users.any { it.authToken == authToken }
+    }
+
+    fun verifyUser(sessionToken: String, authToken: String, userId: Long): Boolean {
+        val session: Session = sessionRepository.findByToken(sessionToken) ?: return false
+        return session.users.any { it.authToken == authToken && it.id == userId }
     }
 
     @Scheduled(

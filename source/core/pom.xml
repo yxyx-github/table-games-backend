@@ -15,8 +15,9 @@
     <name>Table Games Backend Core</name>
 
     <modules>
-        <module>tic-tac-toe</module>
+        <module>general</module>
         <module>session</module>
+        <module>tic-tac-toe</module>
     </modules>
 
     <dependencies>
