@@ -12,12 +12,13 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
 
 @RestController
+@RequestMapping("/api/session")
 class SessionEndpoint(
     private val sessionService: SessionService,
     private val sseService: SseService,
 ) {
 
-    @PostMapping("/session/create")
+    @PostMapping("/create")
     fun createSession(@RequestBody sessionCreationRequest: SessionCreationRequest): SessionCreationResponse {
         val gameState: GameState = when (sessionCreationRequest.game) {
             Game.TIC_TAC_TOE -> TicTacToe()
@@ -26,7 +27,7 @@ class SessionEndpoint(
         return SessionCreationResponse(session.token, session.host.authToken, session.host.id!!)
     }
 
-    @PostMapping("/session/join")
+    @PostMapping("/join")
     fun joinSession(@RequestBody sessionJoinRequest: SessionJoinRequest): SessionJoinResponse {
         val user: User = sessionService.addUserToSession(sessionJoinRequest.sessionToken, sessionJoinRequest.name)
             ?: throw SessionJoinException()
@@ -35,7 +36,7 @@ class SessionEndpoint(
     }
 
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    @PostMapping("/session/close")
+    @PostMapping("/close")
     fun closeSession(@RequestBody sessionCloseRequest: SessionCloseRequest) {
         if (!sessionService.closeSession(sessionCloseRequest.sessionToken, sessionCloseRequest.authToken)) {
             throw SessionCloseException()
@@ -44,7 +45,7 @@ class SessionEndpoint(
         sseService.closeSession(sessionCloseRequest.sessionToken)
     }
 
-    @GetMapping("/session/sse", produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
+    @GetMapping("/sse", produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
     fun sse(@RequestParam sessionToken: String, @RequestParam authToken: String): SseEmitter {
         return sseService.addClient(sessionToken, authToken)
     }

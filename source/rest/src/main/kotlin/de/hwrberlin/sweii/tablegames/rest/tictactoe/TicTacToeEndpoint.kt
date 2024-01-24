@@ -12,13 +12,14 @@ import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 
 @RestController
+@RequestMapping("/api/games/tictactoe")
 class TicTacToeEndpoint(
     private val sessionService: SessionService,
     private val sseService: SseService,
 ) {
 
 
-    @GetMapping("games/tictactoe/state")
+    @GetMapping("/state")
     fun state(@RequestParam sessionToken: String): TicTacToeStateResponse {
         val session: Session = sessionService.getSession(sessionToken) ?: throw InvalidSessionTokenException()
         val ticTacToe: GameState = session.gameState
@@ -37,7 +38,7 @@ class TicTacToeEndpoint(
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PostMapping("/games/tictactoe/action")
+    @PostMapping("/action")
     fun action(@RequestBody ticTacToeActionRequest: TicTacToeActionRequest) {
         if (!sessionService.verifyUser(ticTacToeActionRequest.sessionToken, ticTacToeActionRequest.authToken, ticTacToeActionRequest.userId)) throw InvalidSessionTokenException()
 
