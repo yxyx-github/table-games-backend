@@ -18,6 +18,7 @@ class SessionEndpoint(
     private val sseService: SseService,
 ) {
 
+    @CrossOrigin(originPatterns = ["*"])
     @PostMapping("/create")
     fun createSession(@RequestBody sessionCreationRequest: SessionCreationRequest): SessionCreationResponse {
         val gameState: GameState = when (sessionCreationRequest.game) {
@@ -27,6 +28,7 @@ class SessionEndpoint(
         return SessionCreationResponse(session.token, session.host.authToken, session.host.id!!)
     }
 
+    @CrossOrigin(originPatterns = ["*"])
     @PostMapping("/join")
     fun joinSession(@RequestBody sessionJoinRequest: SessionJoinRequest): SessionJoinResponse {
         val user: User = sessionService.addUserToSession(sessionJoinRequest.sessionToken, sessionJoinRequest.name)
@@ -35,6 +37,7 @@ class SessionEndpoint(
         return SessionJoinResponse(user.authToken, user.id!!)
     }
 
+    @CrossOrigin(originPatterns = ["*"])
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     @PostMapping("/close")
     fun closeSession(@RequestBody sessionCloseRequest: SessionCloseRequest) {
@@ -45,6 +48,7 @@ class SessionEndpoint(
         sseService.closeSession(sessionCloseRequest.sessionToken)
     }
 
+    @CrossOrigin(originPatterns = ["*"])
     @GetMapping("/sse", produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
     fun sse(@RequestParam sessionToken: String, @RequestParam authToken: String): SseEmitter {
         return sseService.addClient(sessionToken, authToken)

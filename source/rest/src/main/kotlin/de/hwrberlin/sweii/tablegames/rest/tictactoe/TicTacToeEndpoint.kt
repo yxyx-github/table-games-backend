@@ -19,6 +19,7 @@ class TicTacToeEndpoint(
 ) {
 
 
+    @CrossOrigin(originPatterns = ["*"])
     @GetMapping("/state")
     fun state(@RequestParam sessionToken: String): TicTacToeStateResponse {
         val session: Session = sessionService.getSession(sessionToken) ?: throw InvalidSessionTokenException()
@@ -37,6 +38,7 @@ class TicTacToeEndpoint(
         )
     }
 
+    @CrossOrigin(originPatterns = ["*"])
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PostMapping("/action")
     fun action(@RequestBody ticTacToeActionRequest: TicTacToeActionRequest) {
