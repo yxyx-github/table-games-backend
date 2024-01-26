@@ -7,8 +7,8 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
 
 @Service
 class SseService(
-    val restConfiguration: RestConfiguration,
-    val sessionService: SessionService
+    private val restConfiguration: RestConfiguration,
+    private val sessionService: SessionService
 ) {
 
     private val sseEmitters: MutableMap<String, MutableMap<String, SseEmitter>> = HashMap()
