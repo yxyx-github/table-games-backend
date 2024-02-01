@@ -14,7 +14,7 @@ class GeneralEndpoint {
     @GetMapping("/list")
     fun gameList(): GameListResponse {
         return GameListResponse(Game.entries.map { game ->
-            GameListResponse.Game(
+            GameResponse(
                 game.name,
                 game.minPlayerCount,
                 game.maxPlayerCount

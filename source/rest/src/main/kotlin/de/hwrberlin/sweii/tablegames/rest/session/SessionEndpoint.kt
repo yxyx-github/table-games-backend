@@ -3,7 +3,10 @@ package de.hwrberlin.sweii.tablegames.rest.session
 import de.hwrberlin.sweii.tablegames.general.Game
 import de.hwrberlin.sweii.tablegames.general.GameState
 import de.hwrberlin.sweii.tablegames.rest.SseService
+import de.hwrberlin.sweii.tablegames.rest.exceptions.InvalidSessionTokenException
+import de.hwrberlin.sweii.tablegames.rest.general.GameResponse
 import de.hwrberlin.sweii.tablegames.session.SessionService
+import de.hwrberlin.sweii.tablegames.session.entity.Session
 import de.hwrberlin.sweii.tablegames.session.entity.User
 import de.hwrberlin.sweii.tablegames.tictactoe.TicTacToe
 import org.springframework.http.HttpStatus
@@ -33,8 +36,38 @@ class SessionEndpoint(
     fun joinSession(@RequestBody sessionJoinRequest: SessionJoinRequest): SessionJoinResponse {
         val user: User = sessionService.addUserToSession(sessionJoinRequest.sessionToken, sessionJoinRequest.name)
             ?: throw SessionJoinException()
+        val session: Session =
+            sessionService.getSession(sessionJoinRequest.sessionToken) ?: throw InvalidSessionTokenException()
         sseService.notifyClients(sessionJoinRequest.sessionToken, "session joined")
-        return SessionJoinResponse(user.authToken, user.id!!)
+        return SessionJoinResponse(
+            user.authToken,
+            UserResponse(user.id!!, user.name, user.id == session.host.id),
+            GameResponse(session.game.name, session.game.maxPlayerCount, session.game.minPlayerCount)
+        )
+    }
+
+    @CrossOrigin(originPatterns = ["*"])
+    @PostMapping("/info")
+    fun sessionInfo(@RequestBody sessionJoinRequest: SessionInfoRequest): SessionInfoResponse {
+        if (!sessionService.verifyUser(
+                sessionJoinRequest.sessionToken,
+                sessionJoinRequest.authToken,
+                sessionJoinRequest.userId
+            )
+        ) {
+            throw InvalidSessionTokenException();
+        }
+        val session: Session =
+            sessionService.getSession(sessionJoinRequest.sessionToken) ?: throw InvalidSessionTokenException()
+        val user: User =
+            session.users.find { user: User -> user.id == sessionJoinRequest.userId && user.authToken == sessionJoinRequest.authToken }!!
+        return SessionInfoResponse(
+            GameResponse(
+                session.game.name,
+                session.game.maxPlayerCount,
+                session.game.maxPlayerCount
+            ), UserResponse(user.id!!, user.name, user.id == session.host.id)
+        )
     }
 
     @CrossOrigin(originPatterns = ["*"])
