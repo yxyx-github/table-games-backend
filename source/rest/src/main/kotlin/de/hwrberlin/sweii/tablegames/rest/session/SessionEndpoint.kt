@@ -36,8 +36,14 @@ class SessionEndpoint(
     fun joinSession(@RequestBody sessionJoinRequest: SessionJoinRequest): SessionJoinResponse {
         val user: User = sessionService.addUserToSession(sessionJoinRequest.sessionToken, sessionJoinRequest.name)
             ?: throw SessionJoinException()
+        val session: Session =
+            sessionService.getSession(sessionJoinRequest.sessionToken) ?: throw InvalidSessionTokenException()
         sseService.notifyClients(sessionJoinRequest.sessionToken, "session joined")
-        return SessionJoinResponse(user.authToken, user.id!!)
+        return SessionJoinResponse(
+            user.authToken,
+            UserResponse(user.id!!, user.name, user.id == session.host.id),
+            GameResponse(session.game.name, session.game.maxPlayerCount, session.game.minPlayerCount)
+        )
     }
 
     @CrossOrigin(originPatterns = ["*"])
