@@ -1,5 +1,3 @@
-// BattleshipsActionRequest.kt
-
 package de.hwrberlin.sweii.tablegames.battleships
 
 data class BattleshipsActionRequest(

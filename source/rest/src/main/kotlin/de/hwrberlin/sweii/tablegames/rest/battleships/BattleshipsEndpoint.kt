@@ -1,5 +1,3 @@
-// BattleshipsEndpoint.kt
-
 package de.hwrberlin.sweii.tablegames.rest.battleships
 
 import de.hwrberlin.sweii.tablegames.battleships.BattleshipsActionRequest
