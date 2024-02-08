@@ -63,7 +63,9 @@ class Chess(
     fun move(startX: Int, startY: Int, targetX: Int, targetY: Int, userId: Long): Boolean {
         val thisTurn: ChessPieceColor = board[startY][startX]?.color ?: return false
 
-        if ((thisTurn == ChessPieceColor.WHITE && userId != whiteUserId) || (thisTurn == ChessPieceColor.BLACK && userId == whiteUserId)) return false
+        if ((thisTurn == ChessPieceColor.WHITE && userId != whiteUserId) ||
+            (thisTurn == ChessPieceColor.BLACK && userId == whiteUserId) ||
+            thisTurn == lastTurn) return false
         if (startX !in 0..<8 || startY !in 0..<8 || targetX !in 0..<8 || targetY !in 0..<8 || board[startY][startX]?.color != thisTurn || state != State.RUNNING || whiteUserId == null) return false
         if (board[startY][startX]?.type == ChessPieceType.PAWN && targetY in arrayOf(0, 7)) return false
         if (!moveIsLegal(startX, startY, targetX, targetY)) return false
@@ -94,7 +96,9 @@ class Chess(
     fun promotion(startX: Int, startY: Int, targetX: Int, targetY: Int, too: ChessPieceType, userId: Long): Boolean {
         val thisTurn: ChessPieceColor = board[startY][startX]?.color ?: return false
 
-        if ((thisTurn == ChessPieceColor.WHITE && userId != whiteUserId) || (thisTurn == ChessPieceColor.BLACK && userId == whiteUserId)) return false
+        if ((thisTurn == ChessPieceColor.WHITE && userId != whiteUserId) ||
+            (thisTurn == ChessPieceColor.BLACK && userId == whiteUserId) ||
+            thisTurn == lastTurn) return false
         if (startX !in 0..<8 || startY !in arrayOf(1, 6) || targetX !in 0..<8 || targetY !in arrayOf(0, 7) ||
             board[startY][startX]?.type != ChessPieceType.PAWN || board[startY][startX]?.color != thisTurn ||
             state != State.RUNNING || whiteUserId == null) return false

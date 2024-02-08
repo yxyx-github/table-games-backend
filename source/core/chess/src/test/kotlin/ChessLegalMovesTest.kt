@@ -1,9 +1,23 @@
 import de.hwrberlin.sweii.tablegames.chess.Chess
 import de.hwrberlin.sweii.tablegames.chess.ChessPiece
 import org.junit.jupiter.api.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class ChessLegalMovesTest {
+
+    @Test
+    fun moveTwiceInARow() {
+        val chess: Chess = Chess()
+        chess.defineWhiteUser(0)
+
+        assertTrue { chess.move(0, 1, 0, 3, 0) }
+        assertFalse { chess.move(0, 3, 0, 4, 0) }
+        assertEquals(ChessPiece.WHITE_PAWN, chess.board[3][0])
+        assertNull(chess.board[4][0])
+    }
 
     @Test
     fun pawnLegalMoves() {
