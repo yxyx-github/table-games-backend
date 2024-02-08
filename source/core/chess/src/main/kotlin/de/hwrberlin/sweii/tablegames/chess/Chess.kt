@@ -39,6 +39,9 @@ class Chess(
     var state: State = State.RUNNING
         private set
 
+    var winner: ChessPieceColor? = null
+        private set
+
     // first y-coordinate, second: x-coordinate
     private var enPassantable: Pair<Int, Int>? = null
 
@@ -48,14 +51,22 @@ class Chess(
 
     private var lastTurn: ChessPieceColor = ChessPieceColor.BLACK
 
+    fun winner(blackUserId: Long): Long? {
+        if (state != State.DECIDED || winner == null) return null
+        return if (winner == ChessPieceColor.BLACK) blackUserId else whiteUserId
+    }
 
-    fun move(startX: Int, startY: Int, targetX: Int, targetY: Int, userId: Long?): Boolean {
-        if (userId != null && whiteUserId == null && lastTurn == ChessPieceColor.BLACK) whiteUserId = userId;
+    fun defineWhiteUser(userId: Long) {
+        whiteUserId = userId
+    }
 
-        if (startX !in 0..<8 || startY !in 0..<8 || targetX !in 0..<8 || targetY !in 0..<8 || board[startY][startX] == null || board[startY][startX]?.color == lastTurn || state != State.RUNNING) return false
+    fun move(startX: Int, startY: Int, targetX: Int, targetY: Int, userId: Long): Boolean {
+        val thisTurn: ChessPieceColor = board[startY][startX]?.color ?: return false
+
+        if ((thisTurn == ChessPieceColor.WHITE && userId != whiteUserId) || (thisTurn == ChessPieceColor.BLACK && userId == whiteUserId)) return false
+        if (startX !in 0..<8 || startY !in 0..<8 || targetX !in 0..<8 || targetY !in 0..<8 || board[startY][startX]?.color != thisTurn || state != State.RUNNING || whiteUserId == null) return false
         if (!moveIsLegal(startX, startY, targetX, targetY)) return false
 
-        val thisTurn: ChessPieceColor = board[startY][startX]?.color ?: return false
         val capturedPiece: ChessPiece? = board[targetY][targetX]
         board[targetY][targetX] = board[startY][startX]
         board[startY][startX] = null
@@ -286,8 +297,11 @@ class Chess(
     }
 
     private fun calculateGameState(nextTurn: ChessPieceColor): State {
+        if (isChecked(nextTurn) && isStalemate(nextTurn)) {
+            winner = if (nextTurn == ChessPieceColor.WHITE) ChessPieceColor.BLACK else ChessPieceColor.WHITE
+            return State.DECIDED
+        }
         if (isDraw(nextTurn)) return State.DRAW
-        if (calculateWinner(nextTurn) != null) return State.DECIDED
         return State.RUNNING
     }
 
@@ -295,15 +309,10 @@ class Chess(
         return movesSinceCapture >= 75 || isDeadPosition() || isStalemate(nextTurn)
     }
 
-    //TODO: CHECK FOR CHECKMATE
-    private fun calculateWinner(nextTurn: ChessPieceColor): ChessPieceColor? {
-        return null
-    }
-
     private fun isStalemate(color: ChessPieceColor): Boolean {
         for (y in 0..<8) {
             for (x in 0..<8) {
-                if (board[y][x]?.color == color && noLegalMoves(y, x)) return false
+                if (board[y][x]?.color == color && hasLegalMoves(y, x)) return false
             }
         }
         return true
@@ -321,14 +330,14 @@ class Chess(
                         )
     }
 
-    private fun noLegalMoves(y: Int, x: Int): Boolean {
+    private fun hasLegalMoves(y: Int, x: Int): Boolean {
         if (board[y][x] == null) return true
         for (targetY in 0..<8) {
             for (targetX in 0..<8) {
-                if (moveIsLegal(x, y, targetX, targetY)) return false
+                if (moveIsLegal(x, y, targetX, targetY)) return true
             }
         }
-        return true
+        return false
     }
 
 }
