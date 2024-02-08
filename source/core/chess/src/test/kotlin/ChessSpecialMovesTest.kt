@@ -1,5 +1,6 @@
 import de.hwrberlin.sweii.tablegames.chess.Chess
 import de.hwrberlin.sweii.tablegames.chess.ChessPiece
+import de.hwrberlin.sweii.tablegames.chess.ChessPieceType
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -34,5 +35,25 @@ class ChessSpecialMovesTest {
         assertEquals(ChessPiece.BLACK_PAWN, chess.board[4][0])
         assertEquals(ChessPiece.BLACK_PAWN, chess.board[4][2])
         assertEquals(ChessPiece.WHITE_PAWN, chess.board[4][3])
+    }
+
+    @Test
+    fun promotion() {
+        val board: Array<Array<ChessPiece?>> = Array(8) { Array(8) { null } }
+        board[0][0] = ChessPiece.WHITE_KING
+        board[1][7] = ChessPiece.BLACK_PAWN
+        board[6][3] = ChessPiece.WHITE_PAWN
+        board[6][6] = ChessPiece.BLACK_KING
+        val chess: Chess = Chess(board)
+        chess.defineWhiteUser(0)
+
+        assertFalse { chess.move(3, 6, 3, 7, 0) }
+        assertTrue { chess.promotion(3, 6, 3, 7, ChessPieceType.QUEEN,0) }
+        assertEquals(ChessPiece.WHITE_QUEEN, chess.board[7][3])
+
+        assertFalse { chess.move(7, 1, 7, 0, 1) }
+        assertFalse { chess.promotion(7, 1, 7, 0, ChessPieceType.PAWN,1) }
+        assertTrue { chess.promotion(7, 1, 7, 0, ChessPieceType.KNIGHT,1) }
+        assertEquals(ChessPiece.BLACK_KNIGHT, chess.board[0][7])
     }
 }

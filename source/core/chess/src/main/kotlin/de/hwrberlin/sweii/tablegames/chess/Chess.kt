@@ -65,6 +65,7 @@ class Chess(
 
         if ((thisTurn == ChessPieceColor.WHITE && userId != whiteUserId) || (thisTurn == ChessPieceColor.BLACK && userId == whiteUserId)) return false
         if (startX !in 0..<8 || startY !in 0..<8 || targetX !in 0..<8 || targetY !in 0..<8 || board[startY][startX]?.color != thisTurn || state != State.RUNNING || whiteUserId == null) return false
+        if (board[startY][startX]?.type == ChessPieceType.PAWN && targetY in arrayOf(0, 7)) return false
         if (!moveIsLegal(startX, startY, targetX, targetY)) return false
 
         val capturedPiece: ChessPiece? = board[targetY][targetX]
@@ -88,6 +89,28 @@ class Chess(
 
         lastTurn = thisTurn;
         return true;
+    }
+
+    fun promotion(startX: Int, startY: Int, targetX: Int, targetY: Int, too: ChessPieceType, userId: Long): Boolean {
+        val thisTurn: ChessPieceColor = board[startY][startX]?.color ?: return false
+
+        if ((thisTurn == ChessPieceColor.WHITE && userId != whiteUserId) || (thisTurn == ChessPieceColor.BLACK && userId == whiteUserId)) return false
+        if (startX !in 0..<8 || startY !in arrayOf(1, 6) || targetX !in 0..<8 || targetY !in arrayOf(0, 7) ||
+            board[startY][startX]?.type != ChessPieceType.PAWN || board[startY][startX]?.color != thisTurn ||
+            state != State.RUNNING || whiteUserId == null) return false
+        if (too !in arrayOf(ChessPieceType.QUEEN, ChessPieceType.ROOK, ChessPieceType.BISHOP, ChessPieceType.KNIGHT)) return false
+        if (!moveIsLegal(startX, startY, targetX, targetY)) return false
+
+        val capturedPiece: ChessPiece? = board[targetY][targetX]
+        val promotedPiece: ChessPiece = ChessPiece.entries.find { it.type == too && it.color == thisTurn }?: return false
+        board[targetY][targetX] = promotedPiece
+        board[startY][startX] = null
+
+        if (capturedPiece == null) movesSinceCapture++ else movesSinceCapture = 0
+        enPassantable = null
+        state = calculateGameState(lastTurn)
+        lastTurn = thisTurn
+        return true
     }
 
     private fun moveIsLegal(startX: Int, startY: Int, targetX: Int, targetY: Int): Boolean {
