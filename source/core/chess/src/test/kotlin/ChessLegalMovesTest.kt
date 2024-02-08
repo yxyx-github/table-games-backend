@@ -15,7 +15,8 @@ class ChessLegalMovesTest {
                 initialBoard[1][2] = ChessPiece.WHITE_KNIGHT
                 initialBoard[3][3] = ChessPiece.WHITE_ROOK
                 val chess: Chess = Chess(initialBoard)
-                result[y][x] = chess.move(2, 1, x, y, null)
+                chess.defineWhiteUser(0)
+                result[y][x] = chess.move(2, 1, x, y, 0)
             }
         }
         assertTrue { result.contentDeepEquals(arrayOf(
@@ -41,7 +42,8 @@ class ChessLegalMovesTest {
                 initialBoard[1][2] = ChessPiece.WHITE_KNIGHT
                 initialBoard[3][3] = ChessPiece.WHITE_ROOK
                 val chess: Chess = Chess(initialBoard)
-                result[y][x] = chess.move(2, 1, x, y, null)
+                chess.defineWhiteUser(0)
+                result[y][x] = chess.move(2, 1, x, y, 0)
             }
         }
         assertTrue { result.contentDeepEquals(arrayOf(
@@ -67,7 +69,8 @@ class ChessLegalMovesTest {
                 initialBoard[3][3] = ChessPiece.WHITE_BISHOP
                 initialBoard[6][6] = ChessPiece.BLACK_PAWN
                 val chess: Chess = Chess(initialBoard)
-                result[y][x] = chess.move(3, 3, x, y, null)
+                chess.defineWhiteUser(0)
+                result[y][x] = chess.move(3, 3, x, y, 0)
             }
         }
         assertTrue { result.contentDeepEquals(arrayOf(
@@ -92,7 +95,8 @@ class ChessLegalMovesTest {
                 initialBoard[3][3] = ChessPiece.WHITE_ROOK
                 initialBoard[1][3] = ChessPiece.BLACK_PAWN
                 val chess: Chess = Chess(initialBoard)
-                result[y][x] = chess.move(3, 3, x, y, null)
+                chess.defineWhiteUser(0)
+                result[y][x] = chess.move(3, 3, x, y, 0)
             }
         }
         assertTrue { result.contentDeepEquals(arrayOf(
@@ -109,7 +113,28 @@ class ChessLegalMovesTest {
 
     @Test
     fun queenLegalMoves() {
+        val result: Array<Array<Boolean>> = Array(8) { Array(8) { true } }
 
+        for (y in 0..<8) {
+            for (x in 0..<8) {
+                val initialBoard: Array<Array<ChessPiece?>> = Array(8) { Array(8) { null } }
+                initialBoard[3][3] = ChessPiece.WHITE_QUEEN
+                initialBoard[1][1] = ChessPiece.BLACK_KING
+                val chess: Chess = Chess(initialBoard)
+                chess.defineWhiteUser(0)
+                result[y][x] = chess.move(3, 3, x, y, 0)
+            }
+        }
+        assertTrue { result.contentDeepEquals(arrayOf(
+            arrayOf(false, false, false, true, false, false, true, false),
+            arrayOf(false, false, false, true, false, true, false, false),
+            arrayOf(false, false, true, true, true, false, false, false),
+            arrayOf(true, true, true, false, true, true, true, true),
+            arrayOf(false, false, true, true, true, false, false, false),
+            arrayOf(false, true, false, true, false, true, false, false),
+            arrayOf(true, false, false, true, false, false, true, false),
+            arrayOf(false, false, false, true, false, false, false, true)
+        )) }
     }
 
     @Test
@@ -123,7 +148,8 @@ class ChessLegalMovesTest {
                 initialBoard[3][3] = ChessPiece.WHITE_KING
                 initialBoard[5][4] = ChessPiece.BLACK_PAWN
                 val chess: Chess = Chess(initialBoard)
-                result[y][x] = chess.move(3, 3, x, y, null)
+                chess.defineWhiteUser(0)
+                result[y][x] = chess.move(3, 3, x, y, 0)
             }
         }
 
@@ -154,7 +180,8 @@ class ChessLegalMovesTest {
                 initialBoard[5][4] = ChessPiece.BLACK_PAWN
                 initialBoard[6][2] = ChessPiece.BLACK_BISHOP
                 val chess: Chess = Chess(initialBoard)
-                result[y][x] = chess.move(3, 3, x, y, null)
+                chess.defineWhiteUser(0)
+                result[y][x] = chess.move(3, 3, x, y, 0)
             }
         }
 
