@@ -56,4 +56,67 @@ class ChessSpecialMovesTest {
         assertTrue { chess.promotion(7, 1, 7, 0, ChessPieceType.KNIGHT,1) }
         assertEquals(ChessPiece.BLACK_KNIGHT, chess.board[0][7])
     }
+
+    @Test
+    fun castle() {
+        val board: Array<Array<ChessPiece?>> = Array(8) { Array(8) { null } }
+        board[0][0] = ChessPiece.WHITE_ROOK
+        board[0][4] = ChessPiece.WHITE_KING
+        board[0][7] = ChessPiece.WHITE_ROOK
+        val chess: Chess = Chess(board)
+        chess.defineWhiteUser(0)
+
+        assertTrue { chess.castle(true, 0) }
+        assertEquals(ChessPiece.WHITE_ROOK, chess.board[0][5])
+        assertEquals(ChessPiece.WHITE_KING, chess.board[0][6])
+        assertNull(chess.board[0][4])
+        assertNull(chess.board[0][7])
+    }
+
+    @Test
+    fun castleNotAllowed() {
+        val board: Array<Array<ChessPiece?>> = Array(8) { Array(8) { null } }
+        board[0][0] = ChessPiece.WHITE_ROOK
+        board[0][1] = ChessPiece.WHITE_KNIGHT
+        board[0][4] = ChessPiece.WHITE_KING
+        board[0][7] = ChessPiece.WHITE_ROOK
+        board[2][7] = ChessPiece.BLACK_BISHOP
+        board[6][5] = ChessPiece.WHITE_PAWN
+        board[7][0] = ChessPiece.BLACK_ROOK
+        board[7][4] = ChessPiece.BLACK_KING
+        board[7][7] = ChessPiece.BLACK_ROOK
+        val chess: Chess = Chess(board)
+        chess.defineWhiteUser(0)
+
+        assertFalse { chess.castle(true, 0) }
+        assertFalse { chess.castle(false, 0) }
+        assertTrue { chess.move(1, 0, 0, 2, 0) }
+
+        assertFalse { chess.castle(true, 1) }
+        assertFalse { chess.castle(false, 1) }
+        assertTrue { chess.move(4, 7, 5, 6, 1) }
+
+        assertFalse { chess.castle(true, 0) }
+        assertTrue { chess.castle(false, 0) }
+
+        assertFalse { chess.castle(true, 1) }
+        assertFalse { chess.castle(false, 1) }
+        assertTrue { chess.move(5, 6, 4, 7, 1) }
+
+        assertFalse { chess.castle(true, 0) }
+        assertFalse { chess.castle(false, 0) }
+        assertTrue { chess.move(0, 2, 1, 0, 0) }
+
+        assertFalse { chess.castle(true, 1) }
+        assertFalse { chess.castle(false, 1) }
+
+        assertNull(chess.board[0][0])
+        assertNull(chess.board[6][5])
+        assertEquals(ChessPiece.WHITE_KING, chess.board[0][2])
+        assertEquals(ChessPiece.WHITE_ROOK, chess.board[0][3])
+        assertEquals(ChessPiece.WHITE_ROOK, chess.board[0][7])
+        assertEquals(ChessPiece.BLACK_ROOK, chess.board[7][0])
+        assertEquals(ChessPiece.BLACK_KING, chess.board[7][4])
+        assertEquals(ChessPiece.BLACK_ROOK, chess.board[7][7])
+    }
 }

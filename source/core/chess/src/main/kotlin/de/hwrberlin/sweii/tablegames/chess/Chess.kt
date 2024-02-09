@@ -42,6 +42,8 @@ class Chess(
     var winner: ChessPieceColor? = null
         private set
 
+    private var castlealbe: Array<Boolean> = Array(4) { true }
+
     // first y-coordinate, second: x-coordinate
     private var enPassantable: Pair<Int, Int>? = null
 
@@ -86,6 +88,11 @@ class Chess(
             enPassantable = null
         }
 
+        if (board[targetY][targetX] == ChessPiece.WHITE_KING || (startX == 0 && startY == 0)) castlealbe[0] = false
+        if (board[targetY][targetX] == ChessPiece.WHITE_KING || (startX == 7 && startY == 0)) castlealbe[1] = false
+        if (board[targetY][targetX] == ChessPiece.BLACK_KING || (startX == 0 && startY == 7)) castlealbe[2] = false
+        if (board[targetY][targetX] == ChessPiece.BLACK_KING || (startX == 7 && startY == 7)) castlealbe[3] = false
+
         if (capturedPiece == null) movesSinceCapture++ else movesSinceCapture = 0
         state = calculateGameState(lastTurn)
 
@@ -113,6 +120,76 @@ class Chess(
         if (capturedPiece == null) movesSinceCapture++ else movesSinceCapture = 0
         enPassantable = null
         state = calculateGameState(lastTurn)
+        lastTurn = thisTurn
+        return true
+    }
+
+    fun castle(kingside: Boolean, userId: Long): Boolean {
+        if (whiteUserId == null) return false
+        val thisTurn : ChessPieceColor = if (userId == whiteUserId) ChessPieceColor.WHITE else ChessPieceColor.BLACK
+        if (thisTurn == lastTurn) return false
+
+        if (!(thisTurn == ChessPieceColor.WHITE && ((kingside && castlealbe[1]) || (!kingside && castlealbe[0])) ||
+            thisTurn == ChessPieceColor.BLACK && ((kingside && castlealbe[3]) || (!kingside && castlealbe[1]))
+            )) return false
+
+        val kingPos: Pair<Int, Int> = if (thisTurn == ChessPieceColor.WHITE) Pair(0, 4) else Pair(7, 4)
+        val from: Int = if (kingside) 5 else 1
+        val to: Int = if (kingside) 6 else 3
+        for (x in from..to) {
+            if (board[kingPos.first][x] != null) return false
+        }
+
+        if (isChecked(thisTurn)) return false
+        if (kingside) {
+            board[kingPos.first][kingPos.second+1] = board[kingPos.first][kingPos.second]
+            board[kingPos.first][kingPos.second] = null
+            if (isChecked(thisTurn)) {
+                board[kingPos.first][kingPos.second] =  board[kingPos.first][kingPos.second+1]
+                board[kingPos.first][kingPos.second+1] = null
+                return false
+            }
+            board[kingPos.first][kingPos.second+2] = board[kingPos.first][kingPos.second+1]
+            board[kingPos.first][kingPos.second+1] = null
+
+            if (isChecked(thisTurn)) {
+                board[kingPos.first][kingPos.second] =  board[kingPos.first][kingPos.second+2]
+                board[kingPos.first][kingPos.second+2] = null
+                return false
+            }
+            board[kingPos.first][kingPos.second+1] = board[kingPos.first][7]
+            board[kingPos.first][7] = null
+
+        } else {
+            board[kingPos.first][kingPos.second-1] = board[kingPos.first][kingPos.second]
+            board[kingPos.first][kingPos.second] = null
+            if (isChecked(thisTurn)) {
+                board[kingPos.first][kingPos.second] =  board[kingPos.first][kingPos.second-1]
+                board[kingPos.first][kingPos.second-1] = null
+                return false
+            }
+            board[kingPos.first][kingPos.second-2] = board[kingPos.first][kingPos.second-1]
+            board[kingPos.first][kingPos.second-1] = null
+
+            if (isChecked(thisTurn)) {
+                board[kingPos.first][kingPos.second] =  board[kingPos.first][kingPos.second-2]
+                board[kingPos.first][kingPos.second-2] = null
+                return false
+            }
+            board[kingPos.first][kingPos.second-1] = board[kingPos.first][0]
+            board[kingPos.first][0] = null
+        }
+
+        if (thisTurn == ChessPieceColor.WHITE) {
+            castlealbe[0] = false
+            castlealbe[1] = false
+        } else {
+            castlealbe[2] = false
+            castlealbe[3] = false
+        }
+        enPassantable = null
+        state = calculateGameState(lastTurn)
+
         lastTurn = thisTurn
         return true
     }
