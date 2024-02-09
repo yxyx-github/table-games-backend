@@ -62,6 +62,13 @@ class Chess(
         whiteUserId = userId
     }
 
+    /**
+     * Tries to move a piece to the given location.
+     * If this move isn't valid false is returned.
+     *
+     * Castling and promotion have their own methods as they require different information to be executed.
+     * EnPassant is a legal move in the context of this method.
+     */
     fun move(startX: Int, startY: Int, targetX: Int, targetY: Int, userId: Long): Boolean {
         val thisTurn: ChessPieceColor = board[startY][startX]?.color ?: return false
 
@@ -100,7 +107,11 @@ class Chess(
         return true;
     }
 
-    fun promotion(startX: Int, startY: Int, targetX: Int, targetY: Int, too: ChessPieceType, userId: Long): Boolean {
+    /**
+     * Tries to promote a pawn to the given piece type.
+     * If promoting isn't allowed in this game context the method returns false.
+     */
+    fun promotion(startX: Int, startY: Int, targetX: Int, targetY: Int, to: ChessPieceType, userId: Long): Boolean {
         val thisTurn: ChessPieceColor = board[startY][startX]?.color ?: return false
 
         if ((thisTurn == ChessPieceColor.WHITE && userId != whiteUserId) ||
@@ -109,11 +120,11 @@ class Chess(
         if (startX !in 0..<8 || startY !in arrayOf(1, 6) || targetX !in 0..<8 || targetY !in arrayOf(0, 7) ||
             board[startY][startX]?.type != ChessPieceType.PAWN || board[startY][startX]?.color != thisTurn ||
             state != State.RUNNING || whiteUserId == null) return false
-        if (too !in arrayOf(ChessPieceType.QUEEN, ChessPieceType.ROOK, ChessPieceType.BISHOP, ChessPieceType.KNIGHT)) return false
+        if (to !in arrayOf(ChessPieceType.QUEEN, ChessPieceType.ROOK, ChessPieceType.BISHOP, ChessPieceType.KNIGHT)) return false
         if (!moveIsLegal(startX, startY, targetX, targetY)) return false
 
         val capturedPiece: ChessPiece? = board[targetY][targetX]
-        val promotedPiece: ChessPiece = ChessPiece.entries.find { it.type == too && it.color == thisTurn }?: return false
+        val promotedPiece: ChessPiece = ChessPiece.entries.find { it.type == to && it.color == thisTurn }?: return false
         board[targetY][targetX] = promotedPiece
         board[startY][startX] = null
 
@@ -124,6 +135,10 @@ class Chess(
         return true
     }
 
+    /**
+     * Tries to execute a castling move for the given player.
+     * If castling isn't allowed in this context the method returns false.
+     */
     fun castle(kingside: Boolean, userId: Long): Boolean {
         if (whiteUserId == null) return false
         val thisTurn : ChessPieceColor = if (userId == whiteUserId) ChessPieceColor.WHITE else ChessPieceColor.BLACK
@@ -194,6 +209,10 @@ class Chess(
         return true
     }
 
+    /**
+     * Checks if a move is legal. This means that the move can be made in the current context of the game.
+     * Special moves such as promotion and castling aren't modeled in this method.
+     */
     private fun moveIsLegal(startX: Int, startY: Int, targetX: Int, targetY: Int): Boolean {
         if (!moveIsValid(startX, startY, targetX, targetY)) return false
         val color: ChessPieceColor = board[startY][startX]!!.color
@@ -352,7 +371,7 @@ class Chess(
     }
 
     /**
-     * Does not look for PAWNS or Kings
+     * Does not look for pawns or kings
      */
     private fun checkedStraightly(color: ChessPieceColor, pos: Pair<Int, Int>): Boolean {
 
@@ -442,5 +461,4 @@ class Chess(
         }
         return false
     }
-
 }
