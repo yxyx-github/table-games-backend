@@ -352,9 +352,8 @@ class Chess(
         val piecesLeft: Map<ChessPiece, Int> = board.flatten().filterNotNull().groupingBy { it }.eachCount()
         return (piecesLeft[ChessPiece.WHITE_KING] ?: 0) == 1 && (piecesLeft[ChessPiece.BLACK_KING] ?: 0) == 1 &&
                 (piecesLeft.size == 2 ||
-                        (piecesLeft.size == 3 && ((piecesLeft[ChessPiece.WHITE_BISHOP]?: 0) == 1) || (piecesLeft[ChessPiece.BLACK_BISHOP]?: 0) == 1) ||
-                        (piecesLeft.size == 3 && ((piecesLeft[ChessPiece.WHITE_KNIGHT]?: 0) == 1) || (piecesLeft[ChessPiece.WHITE_KNIGHT]?: 0) == 1)
-                        )
+                        (piecesLeft.size == 3 && ((piecesLeft[ChessPiece.WHITE_BISHOP]?: 0) == 1 || (piecesLeft[ChessPiece.BLACK_BISHOP]?: 0) == 1)) ||
+                        (piecesLeft.size == 3 && ((piecesLeft[ChessPiece.WHITE_KNIGHT]?: 0) == 1 || (piecesLeft[ChessPiece.BLACK_KNIGHT]?: 0) == 1)))
     }
 
     private fun hasLegalMoves(y: Int, x: Int): Boolean {
