@@ -23,5 +23,5 @@ The `core` module implements the logic of the application, but it does not have 
 ## Execute
 There are multiple ways to execute this project:
 1. If you want to execute it with the compiler of your IDE then you can start all the Application classes manually.
-2. If you want to use Docker than execute a `mvn clean install` and then start the `docker compose` with `docker compsoe up --build docker-compose.yaml` or `docker-compsoe up --build docker-compose.yaml`
+2. If you want to use Docker than execute a `mvn clean install` and then start the `docker compose` with `docker compose up --build docker-compose.yaml` or `docker-compsoe up --build docker-compose.yaml`
 3. If you want to build a jar with dependencies, then execute `mvn clean install` and look for a `...-bin` directory in the target directory. This directory includes a jar and all dependencies as well as a start script. 
