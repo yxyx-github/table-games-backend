@@ -1,7 +1,7 @@
 package de.hwrberlin.sweii.tablegames.rest.session
 
+import de.hwrberlin.sweii.tablegames.chess.Chess
 import de.hwrberlin.sweii.tablegames.general.Game
-import de.hwrberlin.sweii.tablegames.general.GameState
 import de.hwrberlin.sweii.tablegames.rest.SseService
 import de.hwrberlin.sweii.tablegames.rest.exceptions.InvalidSessionTokenException
 import de.hwrberlin.sweii.tablegames.rest.general.GameResponse
@@ -24,10 +24,16 @@ class SessionEndpoint(
     @CrossOrigin(originPatterns = ["*"])
     @PostMapping("/create")
     fun createSession(@RequestBody sessionCreationRequest: SessionCreationRequest): SessionCreationResponse {
-        val gameState: GameState = when (sessionCreationRequest.game) {
-            Game.TIC_TAC_TOE -> TicTacToe()
+        val session: Session = when (sessionCreationRequest.game) {
+            Game.TIC_TAC_TOE -> sessionService.createSession(sessionCreationRequest.host, sessionCreationRequest.game, TicTacToe())
+            Game.CHESS -> {
+                val chess: Chess = Chess()
+                val sess: Session = sessionService.createSession(sessionCreationRequest.host, sessionCreationRequest.game, chess)
+                chess.defineWhiteUser(sess.host.id!!)
+                sessionService.updateGameState(sess.token, chess)
+                sess
+            }
         }
-        val session = sessionService.createSession(sessionCreationRequest.host, sessionCreationRequest.game, gameState)
         return SessionCreationResponse(session.token, session.host.authToken, session.host.id!!)
     }
 
