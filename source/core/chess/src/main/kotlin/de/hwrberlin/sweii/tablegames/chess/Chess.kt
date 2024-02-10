@@ -58,6 +58,10 @@ class Chess(
         return if (winner == ChessPieceColor.BLACK) blackUserId else whiteUserId
     }
 
+    fun turn(blackUserId: Long): Long? {
+        return if (lastTurn == ChessPieceColor.WHITE) blackUserId else whiteUserId
+    }
+
     fun defineWhiteUser(userId: Long) {
         whiteUserId = userId
     }

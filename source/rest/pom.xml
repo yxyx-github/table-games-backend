@@ -22,6 +22,10 @@
         </dependency>
         <dependency>
             <groupId>de.hwr-berlin.swe-ii</groupId>
+            <artifactId>table-games-backend-core-chess</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.hwr-berlin.swe-ii</groupId>
             <artifactId>table-games-backend-core-tic-tac-toe</artifactId>
         </dependency>
         <!-- Spring -->
