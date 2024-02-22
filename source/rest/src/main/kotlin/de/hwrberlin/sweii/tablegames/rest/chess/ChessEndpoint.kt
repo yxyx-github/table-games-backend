@@ -6,14 +6,11 @@ import de.hwrberlin.sweii.tablegames.rest.SseService
 import de.hwrberlin.sweii.tablegames.rest.exceptions.InvalidActionException
 import de.hwrberlin.sweii.tablegames.rest.exceptions.InvalidGameException
 import de.hwrberlin.sweii.tablegames.rest.exceptions.InvalidSessionTokenException
-import de.hwrberlin.sweii.tablegames.rest.exceptions.NotEnoughUsersExecution
-import de.hwrberlin.sweii.tablegames.rest.tictactoe.TicTacToeStateResponse
+import de.hwrberlin.sweii.tablegames.rest.exceptions.NotEnoughUsersException
 import de.hwrberlin.sweii.tablegames.session.SessionService
 import de.hwrberlin.sweii.tablegames.session.entity.Session
-import de.hwrberlin.sweii.tablegames.tictactoe.TicTacToe
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
-import kotlin.system.exitProcess
 
 @RestController
 @RequestMapping("/api/games/chess")
@@ -30,7 +27,7 @@ class ChessEndpoint(
         if (chess !is Chess) {
             throw InvalidGameException("Sessions game isn't chess")
         }
-        val blackUserId: Long = session.users.find { it.id != session.host.id }?.id ?: throw NotEnoughUsersExecution()
+        val blackUserId: Long = session.users.find { it.id != session.host.id }?.id ?: throw NotEnoughUsersException()
         return ChessStateResponse(chess.board, chess.turn(blackUserId)!!, chess.state, chess.winner(blackUserId))
     }
 
@@ -61,6 +58,7 @@ class ChessEndpoint(
             throw InvalidActionException()
         }
         sessionService.updateGameState(chessMoveRequest.sessionToken, chess)
+        sseService.notifyClients(chessMoveRequest.sessionToken, "A piece has moved.")
     }
 
     @CrossOrigin(originPatterns = ["*"])
@@ -91,6 +89,7 @@ class ChessEndpoint(
             throw InvalidActionException()
         }
         sessionService.updateGameState(chessPromotionRequest.sessionToken, chess)
+        sseService.notifyClients(chessPromotionRequest.sessionToken, "A piece has been promoted.")
     }
 
     @CrossOrigin(originPatterns = ["*"])
@@ -117,5 +116,6 @@ class ChessEndpoint(
             throw InvalidActionException()
         }
         sessionService.updateGameState(chessCastleRequest.sessionToken, chess)
+        sseService.notifyClients(chessCastleRequest.sessionToken, "A piece has been castled.")
     }
 }
