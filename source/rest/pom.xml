@@ -37,6 +37,18 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
         </dependency>
+        <dependency>
+            <groupId>de.hwr-berlin.swe-ii</groupId>
+            <artifactId>table-games-backend-core-battleships</artifactId>
+            <version>localbuild</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>de.hwr-berlin.swe-ii</groupId>
+            <artifactId>table-games-backend-core-battleships</artifactId>
+            <version>localbuild</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <build>

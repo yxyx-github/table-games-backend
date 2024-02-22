@@ -1,7 +1,5 @@
 package de.hwrberlin.sweii.tablegames.rest.battleships
 
-import de.hwrberlin.sweii.tablegames.battleships.BattleshipsActionRequest
-import de.hwrberlin.sweii.tablegames.battleships.BattleshipsActionType
 import de.hwrberlin.sweii.tablegames.general.GameState
 import de.hwrberlin.sweii.tablegames.rest.SseService
 import de.hwrberlin.sweii.tablegames.rest.exceptions.InvalidActionException
@@ -9,7 +7,8 @@ import de.hwrberlin.sweii.tablegames.rest.exceptions.InvalidGameException
 import de.hwrberlin.sweii.tablegames.rest.exceptions.InvalidSessionTokenException
 import de.hwrberlin.sweii.tablegames.session.SessionService
 import de.hwrberlin.sweii.tablegames.session.entity.Session
-import de.hwrberlin.sweii.tablegames.battleships.BattleshipsGameState
+import de.hwrberlin.sweii.tablegames.battleships.Battleships
+import de.hwrberlin.sweii.tablegames.rest.exceptions.NotEnoughUsersExecution
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 
@@ -22,70 +21,85 @@ class BattleshipsEndpoint(
 
     @CrossOrigin(originPatterns = ["*"])
     @GetMapping("/state")
-    fun state(@RequestParam sessionToken: String): BattleshipsStateResponse? {
+    fun state(@RequestParam sessionToken: String, @RequestParam authToken: String, @RequestParam userId: Long): BattleshipsStateResponse {
         val session: Session = sessionService.getSession(sessionToken) ?: throw InvalidSessionTokenException()
-        val gameState: GameState = session.gameState
-        if (gameState !is BattleshipsGameState) {
+        sessionService.verifyUser(sessionToken, authToken, userId)
+        val battleships: GameState = session.gameState
+        if (battleships !is Battleships) {
             throw InvalidGameException("Session's game isn't Battleships")
         }
-        val userIds: List<Long> = session.users.map { user -> user.id!! }.toList()
-        val currentUser = session.users.find { user -> user.id == gameState.lastTurn }
-            ?: throw InvalidActionException("Invalid state: Current user not found in session.")
-        val turn: Int =
-            if (userIds.indexOf(gameState.lastTurn) == -1) 0 else (userIds.indexOf(gameState.lastTurn) + 1) % userIds.size
-        return currentUser.id?.let { gameState.getOpponentBoard(it) }?.let { it ->
-            BattleshipsStateResponse(
-                gameState.board,
-                it,
-                userIds[turn],
-                gameState.state(userIds),
-                gameState.winner(userIds),
-                gameState.shipsSunk.map { it.size }
+        val playerTwoId: Long = session.users.find { it.id != session.host.id }?.id ?: throw NotEnoughUsersExecution()
+        if (battleships.playerOneId == userId) {
+            return BattleshipsStateResponse(
+                battleships.playerOne.board,
+                battleships.playerOne.opponentBoard,
+                battleships.lastTurn != userId,
+                battleships.state,
+                battleships.winner(playerTwoId)
             )
         }
+        return BattleshipsStateResponse(
+            battleships.playerTwo.board,
+            battleships.playerTwo.opponentBoard,
+            battleships.lastTurn != userId,
+            battleships.state,
+            battleships.winner(playerTwoId))
     }
 
     @CrossOrigin(originPatterns = ["*"])
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PostMapping("/action")
-    fun action(@RequestBody actionRequest: BattleshipsActionRequest) {
+    @PostMapping("/placeShip")
+    fun placeShip(@RequestBody placeShipRequest: PlaceShipRequest) {
         if (!sessionService.verifyUser(
-                actionRequest.sessionToken,
-                actionRequest.authToken,
-                actionRequest.userId
+                placeShipRequest.sessionToken,
+                placeShipRequest.authToken,
+                placeShipRequest.userId
             )
         ) throw InvalidSessionTokenException()
 
-        val gameState: GameState =
-            sessionService.getGameState(actionRequest.sessionToken) ?: throw InvalidSessionTokenException()
-        if (gameState !is BattleshipsGameState) {
+        val battleships: GameState = sessionService.getGameState(placeShipRequest.sessionToken)
+            ?: throw InvalidSessionTokenException()
+        if (battleships !is Battleships) {
             throw InvalidGameException("Session's game isn't Battleships")
         }
 
-        when (actionRequest.action) {
-            BattleshipsActionType.PLACE_SHIP -> {
-                if (gameState.placeShip(
-                        actionRequest.x,
-                        actionRequest.y,
-                        actionRequest.shipSize!!,
-                        actionRequest.isHorizontal!!,
-                        actionRequest.userId
-                    )
-                ) {
-                    sessionService.updateGameState(actionRequest.sessionToken, gameState)
-                    sseService.notifyClients(actionRequest.sessionToken, "Battleships ship placed")
-                    return
-                }
-            }
-            BattleshipsActionType.ATTACK -> {
-                if (gameState.attack(actionRequest.x, actionRequest.y, actionRequest.userId)) {
-                    sessionService.updateGameState(actionRequest.sessionToken, gameState)
-                    sseService.notifyClients(actionRequest.sessionToken, "Battleships attack happened")
-                    return
-                }
-            }
+        if (battleships.placeShip(
+                placeShipRequest.x,
+                placeShipRequest.y,
+                placeShipRequest.shipType,
+                placeShipRequest.isHorizontal,
+                placeShipRequest.userId
+            )
+        ) {
+            sessionService.updateGameState(placeShipRequest.sessionToken, battleships)
+            sseService.notifyClients(placeShipRequest.sessionToken, "BATTLESHIPS ship placed")
+            return
+        }
+        throw InvalidActionException()
+    }
+
+    @CrossOrigin(originPatterns = ["*"])
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PostMapping("/attack")
+    fun attack(@RequestBody attackRequest: AttackRequest) {
+        if (!sessionService.verifyUser(
+                attackRequest.sessionToken,
+                attackRequest.authToken,
+                attackRequest.userId
+            )
+        ) throw InvalidSessionTokenException()
+
+        val battleships: GameState = sessionService.getGameState(attackRequest.sessionToken)
+            ?: throw InvalidSessionTokenException()
+        if (battleships !is Battleships) {
+            throw InvalidGameException("Session's game isn't Battleships")
         }
 
+        if (battleships.attack(attackRequest.x, attackRequest.y, attackRequest.userId)) {
+            sessionService.updateGameState(attackRequest.sessionToken, battleships)
+            sseService.notifyClients(attackRequest.sessionToken, "BATTLESHIPS attack happened")
+            return
+        }
         throw InvalidActionException()
     }
 }
