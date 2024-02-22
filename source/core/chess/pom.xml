@@ -6,18 +6,19 @@
 
     <parent>
         <groupId>de.hwr-berlin.swe-ii</groupId>
-        <artifactId>table-games-backend</artifactId>
+        <artifactId>table-games-backend-core</artifactId>
         <version>localbuild</version>
     </parent>
 
-    <artifactId>table-games-backend-core</artifactId>
-    <packaging>pom</packaging>
-    <name>Table Games Backend Core</name>
+    <artifactId>table-games-backend-core-chess</artifactId>
+    <packaging>jar</packaging>
+    <name>Table Games Backend Chess</name>
 
-    <modules>
-        <module>general</module>
-        <module>session</module>
-        <module>tic-tac-toe</module>
-        <module>chess</module>
-    </modules>
+    <dependencies>
+        <dependency>
+            <groupId>de.hwr-berlin.swe-ii</groupId>
+            <artifactId>table-games-backend-core-general</artifactId>
+        </dependency>
+    </dependencies>
+
 </project>
