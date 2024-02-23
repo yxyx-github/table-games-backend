@@ -54,19 +54,19 @@ class SessionEndpoint(
 
     @CrossOrigin(originPatterns = ["*"])
     @PostMapping("/info")
-    fun sessionInfo(@RequestBody sessionJoinRequest: SessionInfoRequest): SessionInfoResponse {
+    fun sessionInfo(@RequestBody sessionInfoRequest: SessionInfoRequest): SessionInfoResponse {
         if (!sessionService.verifyUser(
-                sessionJoinRequest.sessionToken,
-                sessionJoinRequest.authToken,
-                sessionJoinRequest.userId
+                sessionInfoRequest.sessionToken,
+                sessionInfoRequest.authToken,
+                sessionInfoRequest.userId
             )
         ) {
             throw InvalidSessionTokenException();
         }
         val session: Session =
-            sessionService.getSession(sessionJoinRequest.sessionToken) ?: throw InvalidSessionTokenException()
+            sessionService.getSession(sessionInfoRequest.sessionToken) ?: throw InvalidSessionTokenException()
         val user: User =
-            session.users.find { user: User -> user.id == sessionJoinRequest.userId && user.authToken == sessionJoinRequest.authToken }!!
+            session.users.find { user: User -> user.id == sessionInfoRequest.userId && user.authToken == sessionInfoRequest.authToken }!!
         return SessionInfoResponse(
             GameResponse(
                 session.game.name,
