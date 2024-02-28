@@ -5,6 +5,7 @@ import de.hwrberlin.sweii.tablegames.general.Game
 import de.hwrberlin.sweii.tablegames.rest.SseService
 import de.hwrberlin.sweii.tablegames.rest.exceptions.InvalidSessionTokenException
 import de.hwrberlin.sweii.tablegames.rest.general.GameResponse
+import de.hwrberlin.sweii.tablegames.rest.logger
 import de.hwrberlin.sweii.tablegames.session.SessionService
 import de.hwrberlin.sweii.tablegames.session.entity.Session
 import de.hwrberlin.sweii.tablegames.session.entity.User
@@ -34,16 +35,16 @@ class SessionEndpoint(
                 sess
             }
         }
+        logger().info("Created a Session with token: ${session.token} and game: ${sessionCreationRequest.game}")
         return SessionCreationResponse(session.token, session.host.authToken, session.host.id!!)
     }
 
     @CrossOrigin(originPatterns = ["*"])
     @PostMapping("/join")
     fun joinSession(@RequestBody sessionJoinRequest: SessionJoinRequest): SessionJoinResponse {
-        val user: User = sessionService.addUserToSession(sessionJoinRequest.sessionToken, sessionJoinRequest.name)
-            ?: throw SessionJoinException()
-        val session: Session =
-            sessionService.getSession(sessionJoinRequest.sessionToken) ?: throw InvalidSessionTokenException()
+        val user: User = sessionService.addUserToSession(sessionJoinRequest.sessionToken, sessionJoinRequest.name) ?: throw SessionJoinException()
+        val session: Session = sessionService.getSession(sessionJoinRequest.sessionToken) ?: throw InvalidSessionTokenException()
+        logger().info("${sessionJoinRequest.name} with authToken ${user.authToken} joined session: ${sessionJoinRequest.sessionToken}")
         sseService.notifyClients(sessionJoinRequest.sessionToken, "session joined")
         return SessionJoinResponse(
             user.authToken,
@@ -63,10 +64,9 @@ class SessionEndpoint(
         ) {
             throw InvalidSessionTokenException();
         }
-        val session: Session =
-            sessionService.getSession(sessionInfoRequest.sessionToken) ?: throw InvalidSessionTokenException()
-        val user: User =
-            session.users.find { user: User -> user.id == sessionInfoRequest.userId && user.authToken == sessionInfoRequest.authToken }!!
+        val session: Session = sessionService.getSession(sessionInfoRequest.sessionToken) ?: throw InvalidSessionTokenException()
+        val user: User = session.users.find { user: User -> user.id == sessionInfoRequest.userId && user.authToken == sessionInfoRequest.authToken }!!
+        logger().info("Send info about session: ${sessionInfoRequest.sessionToken}")
         return SessionInfoResponse(
             GameResponse(
                 session.game.name,
@@ -85,6 +85,7 @@ class SessionEndpoint(
         }
         sseService.notifyClients(sessionCloseRequest.sessionToken, "session closed")
         sseService.closeSession(sessionCloseRequest.sessionToken)
+        logger().info("Closed session: ${sessionCloseRequest.sessionToken}")
     }
 
     @CrossOrigin(originPatterns = ["*"])
