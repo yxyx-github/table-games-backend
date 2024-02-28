@@ -33,7 +33,7 @@ class TicTacToeEndpoint(
         return TicTacToeStateResponse(
             ticTacToe.board,
             userIds[turn],
-            ticTacToe.state(userIds),
+            ticTacToe.state,
             ticTacToe.winner(userIds)
         )
     }
