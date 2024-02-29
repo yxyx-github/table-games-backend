@@ -14,7 +14,11 @@ class SseService(
     private val sseEmitters: MutableMap<String, MutableMap<String, SseEmitter>> = HashMap()
 
     fun notifyClients(sessionToken: String, data: Any) {
-        sseEmitters[sessionToken]?.values?.forEach { it.send(data) }
+        logger().info("Sending $data to all clients of session: $sessionToken")
+        sseEmitters[sessionToken]?.forEach {
+            it.value.send(data)
+            logger().info("Notified session: $sessionToken, authToken: ${it.key} about $data")
+        }
     }
 
     fun addClient(sessionToken: String, authToken: String): SseEmitter {
@@ -27,6 +31,7 @@ class SseService(
 
         if (!sseEmitters.containsKey(sessionToken)) {
             sseEmitters[sessionToken] = mutableMapOf(Pair(authToken, emitter))
+            logger().info("Created SseEmitter for session: $sessionToken with authToken: $authToken")
             return emitter
         }
 
@@ -35,6 +40,7 @@ class SseService(
         }
 
         sseEmitters[sessionToken]?.set(authToken, emitter)
+        logger().info("Created SseEmitter for session: $sessionToken with authToken: $authToken")
         return emitter
     }
 
@@ -43,10 +49,12 @@ class SseService(
         if (sseEmitters[sessionToken]?.isEmpty() == true) {
             sseEmitters.remove(sessionToken)
         }
+        logger().info("Closed SseEmitter for session: $sessionToken with authToken: $authToken")
     }
 
     fun closeSession(sessionToken: String) {
         sseEmitters[sessionToken]?.forEach { it.value.complete() }
         sseEmitters.remove(sessionToken)
+        logger().info("Closed SseEmitters for session: $sessionToken",)
     }
 }
