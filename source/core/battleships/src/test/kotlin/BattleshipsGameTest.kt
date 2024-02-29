@@ -255,8 +255,11 @@ class BattleshipsGameTest {
         }
 
         y = 0
+
+
+        /*
         for (ship in ShipType.entries) {
-            for (x in 0 until  ship.size ) {
+            for (x in 0 until  ship.size -1 ) {
                 println("Ship being tested: " + ship.name)
                 println("x: " + x.toString())
                 println("y: " + y.toString())
@@ -264,13 +267,50 @@ class BattleshipsGameTest {
             }
             y += 2
         }
+        */
 
+        //Attacking Destroyer
+        assertTrue { battleships.attack(0, 0, 1) }
 
+        assertContains(battleships.playerTwo.shipsSunk, ShipType.DESTROYER)
+
+        //Attacking Submarine
+        assertTrue { battleships.attack(0, 2, 1) }
+        assertTrue { battleships.attack(1, 2, 1) }
+
+        assertContains(battleships.playerTwo.shipsSunk, ShipType.SUBMARINE)
+
+        //Attacking Cruiser
+        assertTrue { battleships.attack(0, 4, 1) }
+        assertTrue { battleships.attack(1, 4, 1) }
+        assertTrue { battleships.attack(2, 4, 1) }
+
+        assertContains(battleships.playerTwo.shipsSunk, ShipType.CRUISER)
+
+        //Attacking Battleship
+        assertTrue { battleships.attack(0, 6, 1) }
+        assertTrue { battleships.attack(1, 6, 1) }
+        assertTrue { battleships.attack(2, 6, 1) }
+        assertTrue { battleships.attack(3, 6, 1) }
+
+        assertContains(battleships.playerTwo.shipsSunk, ShipType.BATTLESHIP)
+
+        //Attacking Carrier
+        assertTrue { battleships.attack(0, 8, 1) }
+        assertTrue { battleships.attack(1, 8, 1) }
+        assertTrue { battleships.attack(2, 8, 1) }
+        assertTrue { battleships.attack(3, 8, 1) }
+        assertTrue { battleships.attack(4, 8, 1) }
+
+        assertContains(battleships.playerTwo.shipsSunk, ShipType.CARRIER)
+
+        /*
         for (ship in ShipType.entries) {
             println("Checking for")
             println(ship)
             assertContains(battleships.playerTwo.shipsSunk, ship)
         }
+         */
 
 
     }

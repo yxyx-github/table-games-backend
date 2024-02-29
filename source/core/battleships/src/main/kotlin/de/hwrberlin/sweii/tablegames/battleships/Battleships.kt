@@ -132,7 +132,7 @@ data class Battleships (
             return true
         }
         val horizontal: Boolean = (x - 1 in 0..<10 && opponentState.board[x - 1][y] == ShipStatus.HIT) || (x + 1 in 0..<10 && opponentState.board[x + 1][y] == ShipStatus.HIT)
-        var size = 2
+        var size = 1
         var endX: Int = 0
         var endY: Int = 0
 
