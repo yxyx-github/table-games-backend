@@ -131,16 +131,13 @@ data class Battleships (
             markBordering(x, y, state, opponentState)
             return true
         }
-        val horizontal: Boolean = (x - 1 in 0..<10 && opponentState.board[x - 1][y] == ShipStatus.HIT) || (x + 1 in 0..<10 && opponentState.board[x + 1][y] == ShipStatus.HIT)
+        val horizontal: Boolean = (x - 1 in 0..<10 && (opponentState.board[x - 1][y] == ShipStatus.HIT || opponentState.board[x - 1][y] == ShipStatus.SHIP)) || (x + 1 in 0..<10 && (opponentState.board[x + 1][y] == ShipStatus.HIT || opponentState.board[x + 1][y] == ShipStatus.SHIP))
         var size = 1
         var endX: Int = 0
         var endY: Int = 0
-
         for (offset in 1..<10 - (if (horizontal) x else y) ) {
             when (opponentState.board[if (horizontal) x + offset else x][if (!horizontal) y + offset else y]) {
                 ShipStatus.EMPTY, ShipStatus.MISS -> {
-                    println("Loop One EMPTY / MISS")
-                    println(offset)
                     size += offset - 1
                     endX = if (horizontal) x + offset -1 else x
                     endY = if (!horizontal) y + offset -1 else y
@@ -150,8 +147,6 @@ data class Battleships (
                 ShipStatus.SHIP -> return false
                 ShipStatus.HIT -> {
                     if ((horizontal && x + offset == 9) || (!horizontal && y + offset == 9)) {
-                        println("Loop One HIT")
-                        println(offset)
                         size += offset
                         endX = if (horizontal) 9 else x
                         endY = if (!horizontal) 9 else y
@@ -165,27 +160,23 @@ data class Battleships (
         for (offset in 1..(if (horizontal) x else y) ) {
             when (opponentState.board[if (horizontal) x - offset else x][if (!horizontal) y - offset else y]) {
                 ShipStatus.EMPTY, ShipStatus.MISS -> {
-                    println("Loop Two EMPTY / MISS")
-                    println(offset)
                     size += offset -1
-                    endX = if (horizontal) x - offset +1 else x
-                    endY = if (!horizontal) y - offset +1 else y
+                    startX = if (horizontal) x - offset +1 else x
+                    startY = if (!horizontal) y - offset +1 else y
                     break
                 }
 
                 ShipStatus.SHIP -> return false
+
                 ShipStatus.HIT -> {
-                    if ((horizontal && x + offset == 0) || (!horizontal && y + offset == 0)) {
-                        println("Loop Two HIT")
-                        println(offset)
+                    if ((horizontal && x - offset == 0) || (!horizontal && y - offset == 0)) {
                         size += offset
-                        endX = if (horizontal) 0 else x
-                        endY = if (!horizontal) 0 else y
+                        startX = if (horizontal) 0 else x
+                        startY = if (!horizontal) 0 else y
                     }
                 }
             }
         }
-            println(size)
             state.shipsSunk.add(ShipType.entries.find { it.size == size }
                 ?: throw IllegalStateException("Ship of expected size does not exist"))
             markBordering(startX, startY, endX, endY, state, opponentState)
