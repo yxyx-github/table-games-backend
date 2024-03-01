@@ -1,5 +1,6 @@
 package de.hwrberlin.sweii.tablegames.rest.session
 
+import de.hwrberlin.sweii.tablegames.battleships.Battleships
 import de.hwrberlin.sweii.tablegames.chess.Chess
 import de.hwrberlin.sweii.tablegames.general.Game
 import de.hwrberlin.sweii.tablegames.rest.SseService
@@ -32,6 +33,14 @@ class SessionEndpoint(
                 val sess: Session = sessionService.createSession(sessionCreationRequest.host, sessionCreationRequest.game, chess)
                 chess.defineWhiteUser(sess.host.id!!)
                 sessionService.updateGameState(sess.token, chess)
+                sess
+            }
+
+            Game.BATTLESHIPS -> {
+                val battleships: Battleships = Battleships()
+                val sess: Session = sessionService.createSession(sessionCreationRequest.host, sessionCreationRequest.game, battleships)
+                battleships.definePlayerOne(sess.host.id!!)
+                sessionService.updateGameState(sess.token, battleships)
                 sess
             }
         }
