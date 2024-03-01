@@ -5,6 +5,7 @@ import de.hwrberlin.sweii.tablegames.rest.SseService
 import de.hwrberlin.sweii.tablegames.rest.exceptions.InvalidActionException
 import de.hwrberlin.sweii.tablegames.rest.exceptions.InvalidGameException
 import de.hwrberlin.sweii.tablegames.rest.exceptions.InvalidSessionTokenException
+import de.hwrberlin.sweii.tablegames.rest.logger
 import de.hwrberlin.sweii.tablegames.session.SessionService
 import de.hwrberlin.sweii.tablegames.session.entity.Session
 import de.hwrberlin.sweii.tablegames.tictactoe.TicTacToe
@@ -30,10 +31,11 @@ class TicTacToeEndpoint(
         val userIds: List<Long> = session.users.map { user -> user.id!! }.toList()
         val turn: Int =
             if (userIds.indexOf(ticTacToe.lastTurn) == -1) 0 else (userIds.indexOf(ticTacToe.lastTurn) + 1) % userIds.size
+        logger().info("Send tic tac toe state for session: $sessionToken")
         return TicTacToeStateResponse(
             ticTacToe.board,
             userIds[turn],
-            ticTacToe.state(userIds),
+            ticTacToe.state,
             ticTacToe.winner(userIds)
         )
     }
@@ -51,6 +53,7 @@ class TicTacToeEndpoint(
 
         if (ticTacToe.move(ticTacToeActionRequest.x, ticTacToeActionRequest.y, ticTacToeActionRequest.userId)) {
             sessionService.updateGameState(ticTacToeActionRequest.sessionToken, ticTacToe)
+            logger().info("Placed mark at x: ${ticTacToeActionRequest.x}, y: ${ticTacToeActionRequest.y} in session: ${ticTacToeActionRequest.sessionToken}")
             sseService.notifyClients(ticTacToeActionRequest.sessionToken, "TIC_TAC_TOE move happened")
             return
         }

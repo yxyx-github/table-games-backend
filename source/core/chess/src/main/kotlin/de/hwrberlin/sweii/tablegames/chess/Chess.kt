@@ -47,7 +47,7 @@ class Chess(
     // first y-coordinate, second: x-coordinate
     private var enPassantable: Pair<Int, Int>? = null
 
-    private var movesSinceCapture = 0
+    private var movesSinceCapture: Int = 0
 
     private var whiteUserId: Long? = null
 
