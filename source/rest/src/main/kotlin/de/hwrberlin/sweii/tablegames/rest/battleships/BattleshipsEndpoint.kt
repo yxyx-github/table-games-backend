@@ -8,7 +8,7 @@ import de.hwrberlin.sweii.tablegames.rest.exceptions.InvalidSessionTokenExceptio
 import de.hwrberlin.sweii.tablegames.session.SessionService
 import de.hwrberlin.sweii.tablegames.session.entity.Session
 import de.hwrberlin.sweii.tablegames.battleships.Battleships
-import de.hwrberlin.sweii.tablegames.rest.exceptions.NotEnoughUsersExecution
+import de.hwrberlin.sweii.tablegames.rest.exceptions.NotEnoughUsersException
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 
@@ -28,7 +28,7 @@ class BattleshipsEndpoint(
         if (battleships !is Battleships) {
             throw InvalidGameException("Session's game isn't Battleships")
         }
-        val playerTwoId: Long = session.users.find { it.id != session.host.id }?.id ?: throw NotEnoughUsersExecution()
+        val playerTwoId: Long = session.users.find { it.id != session.host.id }?.id ?: throw NotEnoughUsersException()
         if (battleships.playerOneId == userId) {
             return BattleshipsStateResponse(
                 battleships.playerOne.board,
