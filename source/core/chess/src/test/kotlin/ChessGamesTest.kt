@@ -1,10 +1,34 @@
 import de.hwrberlin.sweii.tablegames.chess.Chess
+import de.hwrberlin.sweii.tablegames.chess.ChessPiece
 import de.hwrberlin.sweii.tablegames.chess.State
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class ChessGamesTest {
+
+    @Test
+    fun startingPosition() {
+        val chess: Chess = Chess()
+        assertEquals(ChessPiece.WHITE_ROOK, chess.board[0][0])
+        assertEquals(ChessPiece.WHITE_KNIGHT, chess.board[0][1])
+        assertEquals(ChessPiece.WHITE_BISHOP, chess.board[0][2])
+        assertEquals(ChessPiece.WHITE_QUEEN, chess.board[0][3])
+        assertEquals(ChessPiece.WHITE_KING, chess.board[0][4])
+        assertEquals(ChessPiece.WHITE_BISHOP, chess.board[0][5])
+        assertEquals(ChessPiece.WHITE_KNIGHT, chess.board[0][6])
+        assertEquals(ChessPiece.WHITE_ROOK, chess.board[0][7])
+        for (x in 0..7) assertEquals(ChessPiece.WHITE_PAWN, chess.board[1][x])
+        for (x in 0..7) assertEquals(ChessPiece.BLACK_PAWN, chess.board[6][x])
+        assertEquals(ChessPiece.BLACK_ROOK, chess.board[7][0])
+        assertEquals(ChessPiece.BLACK_KNIGHT, chess.board[7][1])
+        assertEquals(ChessPiece.BLACK_BISHOP, chess.board[7][2])
+        assertEquals(ChessPiece.BLACK_QUEEN, chess.board[7][3])
+        assertEquals(ChessPiece.BLACK_KING, chess.board[7][4])
+        assertEquals(ChessPiece.BLACK_BISHOP, chess.board[7][5])
+        assertEquals(ChessPiece.BLACK_KNIGHT, chess.board[7][6])
+        assertEquals(ChessPiece.BLACK_ROOK, chess.board[7][7])
+    }
 
     /**
      * Example game taken from https://en.wikibooks.org/wiki/Chess/Sample_chess_game
